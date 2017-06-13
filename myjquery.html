@@ -1,0 +1,231 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+
+    </style>
+    <script type="text/javascript">
+
+        /*
+
+
+        * 1.  查询  $("")
+        *
+        * 2.  隐式循环
+        *
+        * 3.  链式调用
+        *
+        *
+        *
+        * 4.  面向对象的编程方式
+        *
+        *  目的
+        *
+        *  对象.属性
+        *  对象.方法（）
+        *
+        *
+        *  1.  选择器        将选择的元素放入到jquery对象里面
+        *  2.  html标签      创建指定的元素放入到jquery对象里面
+        *  3.  函数          函数里面的内容在页面加载完成之后执行
+        *  4.  dom对象       将原生的dom对象包裹到jquery对象里面
+        *  5.  空的          返回一个不包含任何元素的jquery空对象
+        *  6.  jquery对象    返回原jQuery对象
+        *
+        *
+        * */
+
+
+
+        function myJquery(selector){
+
+              this.flag="jquery";
+              if(this.isString(selector)){
+                var selector=this.trim(selector,"both");
+                if(selector.charAt(0)=="<"){
+                    var ele=selector.slice(1,-1);
+
+                    this[0]=document.createElement(ele);
+                    this.length=1;
+                }else{
+
+                    this.selector=selector;
+                    var ele=document.querySelectorAll(selector);
+
+                    for(var i=0;i<ele.length;i++){
+                        this[i]=ele[i];
+                    }
+                    this.length=ele.length;
+
+                }
+              }else if(this.isFunction(selector)){
+                    this.ready(selector)
+              }else if(selector.nodeType==1){
+                  this[0]=selector;
+                  this.length=1;
+              }else if(selector===undefined){
+                  return this;
+              }else if(typeof selector=="object"&&selector.flag=="jquery"){
+                  return selector;
+              }
+        }
+        myJquery.prototype={
+          isString:function(str){
+              if(typeof str=="string"){
+                  return true;
+              }
+              return false;
+          },
+            isFunction:function(str){
+                if(typeof str=="function"){
+                    return true;
+                }
+                return false;
+            },
+          trim:function(str,type){
+              var type=type||"all";
+              var newstr;
+              if(type=="all"){
+                  newstr=str.replace(/\s*/g,"");
+              }else if(type=="both"){
+                  newstr=str.replace(/^\s*|\s*$/g,"");
+              }else if(type=="left"){
+                  newstr=str.replace(/^\s*/g,"");
+              }else if(type=="right"){
+                  newstr=str.replace(/\s*$/g,"");
+              }
+
+              return newstr;
+          },
+            ready:function(callback){
+              document.addEventListener("DOMContentLoaded",function(){
+                  callback();
+              })
+            },
+            each:function(callback){
+                for(var i=0;i<this.length;i++){
+                    callback(this[i],i);
+                }
+            },
+            css:function(cssObj){
+
+                this.each(function(obj,index){
+
+                        for(var i in cssObj){
+                          if(i=="width"||i=="height"||i=="padding"){
+
+                              var val=parseInt(cssObj[i])+"px";
+                          }else{
+                              var val=cssObj[i];
+                          }
+                          obj.style[i]=val;
+                        }
+                })
+                return this;
+            },
+
+            html:function(val){
+                this.each(function(obj,index){
+                    obj.innerHTML=val;
+                })
+
+                return this;
+            },
+
+            click:function(callback){
+                this.each(function(obj,index){
+                    obj.onclick=function(){
+                        callback.call(obj);
+                    }
+                })
+
+                return this;
+            },
+
+            mousedown:function(callback){
+                this.each(function(obj,index){
+                    obj.onmousedown=function(){
+                        callback.call(obj);
+                    }
+                })
+
+            },
+            mousemove:function(callback){
+                this.each(function(obj,index){
+                    obj.onmousemove=function(){
+                        callback.call(obj);
+                    }
+                })
+
+            },
+            size:function(){
+
+                return this.length;
+            },
+            get:function(num){
+                if(num===undefined){
+
+                    var arr=[];
+                    for(var i=0;i<this.length;i++){
+                        arr.push(this[i])
+                    }
+                    return arr;
+
+                }else {
+                    return this[num];
+                }
+            },
+            index:function(alls){
+               for(var i=0;i<alls.length;i++){
+                   if(this[0]==alls[i]){
+                       return i;
+                   }
+               }
+            }
+        }
+
+
+
+        function $(selector){
+            //对象封装
+            return new myJquery(selector);
+        }
+
+        $(function(){
+            $("div").click(function(){
+                alert($(this).index($("div")));
+            }).css({
+                width:200,height:200,border:"1px solid red"
+            })
+        })
+
+
+    </script>
+</head>
+<body>
+
+<ul>
+<div class="one"></div>
+<div class="one"></div>
+<div class="one"></div>
+<div class="one"></div>
+<div class="one"></div>
+<div class="one"></div>
+</ul>
+
+<dl>
+    <div class="one"></div>
+    <div class="one"></div>
+    <div class="one"></div>
+    <div class="one"></div>
+    <div class="one"></div>
+    <div class="one"></div>
+</dl>
+
+</body>
+</html>
